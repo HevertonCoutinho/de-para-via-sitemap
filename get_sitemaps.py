@@ -1,2 +1,2 @@
 def get_sitemap_urls():
-    return input("Insira os URLs dos sitemaps, separados por vírgula: ").split(",")
+    return ['https://www.pensefarma.com.br/sitemap/product-0.xml', 'https://www.pensefarma.com.br/sitemap/product-1.xml']
