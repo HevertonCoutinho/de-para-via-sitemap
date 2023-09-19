@@ -54,12 +54,25 @@ def main(sitemap_urls):
                     most_similar_url = url2
         if most_similar_url:
             matches_dict[url1] = most_similar_url
+            print(f"Match encontrado para {url1}: {matches_dict}")
 
     # Escrever as URLs semelhantes em um arquivo CSV
     with open('de-para-categorias.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['URL 1', 'URL 2'])
+        writer.writerow(['DE', 'PARA', 'MENSAGEM'])
         for url1, url2 in matches_dict.items():
-            writer.writerow([url1, url2])
+            mensagem = ""
+            if url1 == url2:
+                mensagem = "URLs idênticas, possível retorno da categoria"
+            else:
+                parsed_url1 = urlparse(url1)
+                parsed_url2 = urlparse(url2)
+                path1 = parsed_url1.path.strip('/')
+                path2 = parsed_url2.path.strip('/')
+                words1 = path1.split('-')
+                words2 = path2.split('-')
+                if words1[0] != words2[0]:
+                    mensagem = "Possível erro devido a baixa similaridade"
+            writer.writerow([url1, url2, mensagem])
 if __name__ == "__main__":
     main()
