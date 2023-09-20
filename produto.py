@@ -37,10 +37,11 @@ def main(sitemap_urls):
             words2 = path2.split('-')
 
             if words1[0] == words2[0]:
-                # Calcula a similaridade entre as URLs comparando as palavras após o domínio
                 common_words = set(words1[1:]) & set(words2[1:])
-                similarity = len(common_words) / len(set(words1[1:]))
-
+                if common_words:
+                    similarity = len(common_words) / len(set(words1[1:]))
+                else:
+                    similarity = 0  # Define a similaridade como 0 se não houver palavras em comum
                 if similarity > best_similarity:
                     best_match = url2
                     best_similarity = similarity
