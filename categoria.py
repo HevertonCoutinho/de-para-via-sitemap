@@ -12,9 +12,10 @@ def main(sitemap_urls):
         for url in sitemap_xml.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}url'):
             loc = url.find('{http://www.sitemaps.org/schemas/sitemap/0.9}loc').text
             urls2.append(loc)
+        print(sitemap_response)
 
     # Lendo URLs do arquivo CSV
-    with open('categories404.csv', newline='') as csvfile:
+    with open('categories404.csv', newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         urls1 = [row[0] for row in reader]
 
@@ -54,7 +55,7 @@ def main(sitemap_urls):
                     most_similar_url = url2
         if most_similar_url:
             matches_dict[url1] = most_similar_url
-            print(f"Match encontrado para {url1}: {matches_dict}")
+            print(f"Match encontrado para {url1}: {most_similar_url}")
 
     # Escrever as URLs semelhantes em um arquivo CSV
     with open('de-para-categorias.csv', 'w', newline='') as csvfile:
