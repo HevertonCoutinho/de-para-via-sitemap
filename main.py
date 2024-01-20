@@ -54,6 +54,12 @@ escolha = int(input('1 - Adicionar ao banco\n2 - Inserir o sitemap manualmente\n
 
 resultado = None
 
+# Função para verificar se já existe um CB na tabela
+def verificar_cb_existente(cursor, cb):
+    cursor.execute("SELECT COUNT(*) FROM cliente WHERE cb = ?", (cb,))
+    quantidade = cursor.fetchone()[0]
+    return quantidade > 0
+
 if escolha == 1:
     
     conn = sqlite3.connect('banco.db')
@@ -71,19 +77,34 @@ if escolha == 1:
 
     cliente = str(input('Nome do cliente: '))
     cb = int(input('CB: '))
-    entrada_usuario = input('Insira a lista de sitemaps separados por vírgula:\n> ')
-    sitemap = list(map(str.strip, entrada_usuario.split(',')))
-
-    sitemaps_json = json.dumps(sitemap)
-
-    cursor.execute("INSERT INTO cliente (cliente, cb, sitemap) VALUES (?, ?, ?)", (cliente, cb, sitemaps_json))
+    
+    # Verifique se já existe um cliente com o mesmo CB
+    if verificar_cb_existente(cursor, cb):
+        resposta = input(f"Já existe um cliente com o CB {cb}. Deseja continuar e substituir? (s/n): ").lower()
+        if resposta != 's':
+            print("Inserção cancelada.")
+            conn.close()
+            exit()
+            
+        # Se o usuário decidiu continuar, atualize a linha existente
+        entrada_usuario = input('Insira a lista de sitemaps separados por vírgula:\n> ')
+        sitemap = list(map(str.strip, entrada_usuario.split(',')))
+        sitemaps_json = json.dumps(sitemap)
+        cursor.execute("UPDATE cliente SET cliente = ?, sitemap = ? WHERE cb = ?", (cliente, sitemaps_json, cb))
+        print("Cliente Atualizado")
+    else:
+        # Se não existir, insira uma nova linha       
+        entrada_usuario = input('Insira a lista de sitemaps separados por vírgula:\n> ')
+        sitemap = list(map(str.strip, entrada_usuario.split(',')))
+        sitemaps_json = json.dumps(sitemap)
+        cursor.execute("INSERT INTO cliente (cliente, cb, sitemap) VALUES (?, ?, ?)", (cliente, cb, sitemaps_json))
+        print("Cliente Adicionado")
 
     conn.commit()
 
     cliente_nome = cliente
     cursor.execute("SELECT sitemap FROM cliente WHERE cliente = ?", (cliente_nome,))
     resultado = cursor.fetchone()
-    print("Cliente Adicionado")
 
 elif escolha == 2:
 
